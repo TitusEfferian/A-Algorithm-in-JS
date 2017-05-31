@@ -11,8 +11,7 @@ function removeFromArray(arr,element)
 
 function heuristic(a,b)
 {
-  //var d=dist(a.i,a.j,b.i,b.j);
-  var d=abs(a.i-b.i)+abs(a.j-b.j);
+  var d=dist(a.i,a.j,b.i,b.j);
   return d;
 }
 
@@ -121,8 +120,11 @@ function setup() {
       grid[i][j].addNeighbors(grid);
     }
   }
+  var randCols = random(49);
+  var randRows = random(49);
    start= grid[0][0];
-   end=grid[cols-1][rows-1];
+   //end=grid[round(randCols)][round(randRows)];
+   end = grid[cols-1][rows-1];
    start.wall=false;
    end.wall=false;
    openSet.push(start);
@@ -149,7 +151,6 @@ function draw() {
     if(current===end)
     {
       //find the path
-
       noLoop();
       console.log("done");
     }
@@ -162,26 +163,29 @@ function draw() {
       if(!closedSet.includes(neighbor) && !neighbor.wall)
       {
         var tempG = current.g+1;
+        var newPath=false;
         if(openSet.includes(neighbor))
         {
           if(tempG<neighbor.g)
           {
             neighbor.g=tempG;
+            newPath=true;
           }
         }
         else
         {
           neighbor.g=tempG;
+          newPath=true;
           openSet.push(neighbor);
         }
-
+        if(newPath)
+        {
         //heuristic
-
-        neighbor.h=heuristic(neighbor,end);
-        neighbor.f=neighbor.g+neighbor.h;
-        neighbor.previous=current;
+          neighbor.h=heuristic(neighbor,end);
+          neighbor.f=neighbor.g+neighbor.h;
+          neighbor.previous=current;
+        }
       }
-
     }
     //we can keep going
   }
@@ -210,8 +214,6 @@ function draw() {
   {
     openSet[i].show(color(0,255,0));
   }
-
-
 
     path=[];
     var temp=current;
