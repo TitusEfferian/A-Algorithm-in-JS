@@ -9,8 +9,14 @@ function removeFromArray(arr,element)
   }
 }
 
-var cols=5;
-var rows=5;
+function heuristic(a,b)
+{
+  var d=dist(a.i,a.j,b.i,b.j);
+  return d;
+}
+
+var cols=50;
+var rows=50;
 var grid=new Array(cols);
 
 var openSet=[];
@@ -30,6 +36,7 @@ function Spot(i,j)
   this.h=0;
 
   this.neighbors=[];
+  this.previous=undefined;
 
   this.show=function(col)
   {
@@ -43,19 +50,19 @@ function Spot(i,j)
     var j = this.j;
     if(i<cols-1)
     {
-      this.neighbors.push(grid[i+1,j]);
+      this.neighbors.push(grid[i+1][j]);
     }
     if(i>0)
     {
-      this.neighbors.push(grid[i-1,j]);
+      this.neighbors.push(grid[i-1][j]);
     }
     if(j<rows-1)
     {
-      this.neighbors.push(grid[i,j+1]);
+      this.neighbors.push(grid[i][j+1]);
     }
     if(j>0)
     {
-        this.neighbors.push(grid[i,j-1]);
+        this.neighbors.push(grid[i][j-1]);
     }
 
   }
@@ -110,10 +117,39 @@ function draw() {
 
     if(current===end)
     {
+      //find the path
       console.log("done");
     }
     removeFromArray(openSet,current);
     closedSet.push(current);
+    var neighbors = current.neighbors;
+    for(var i=0;i<neighbors.length;i++)
+    {
+      var neighbor = neighbors[i];
+      if(!closedSet.includes(neighbor))
+      {
+        var tempG = current.g+1;
+        if(openSet.includes(neighbor))
+        {
+          if(tempG<neighbor.g)
+          {
+            neighbor.g=tempG;
+          }
+        }
+        else
+        {
+          neighbor.g=tempG;
+          openSet.push(neighbor);
+        }
+
+        //heuristic
+
+        neighbor.h=heuristic(neighbor,end);
+        neighbor.f=neighbor.g+neighbor.h;
+        neighbor.previous=current;
+      }
+
+    }
     //we can keep going
   }
   else
